@@ -1,0 +1,24 @@
+1:"$Sreact.fragment"
+2:I[347257,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"ClientPageRoot"]
+3:I[331713,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2paf-s82-yieu.js","/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","/qiguanui-registry/_next/static/chunks/3rbg903o3gv2t.js","/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js","/qiguanui-registry/_next/static/chunks/1kzft7qzzohcx.js","/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js"],"default"]
+6:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"OutletBoundary"]
+7:"$Sreact.suspense"
+b:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"ViewportBoundary"]
+c:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"MetadataBoundary"]
+d:I[27201,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"IconMark"]
+f:I[339756,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+10:I[837457,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+a:X
+12:X
+12:C
+0:{"buildId":"ZxYWgno_BwMKChaH2H226","data":[{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"Component":"$3","serverProvidedParams":{"searchParams":{},"params":{},"promises":["$@4","$@5"]}}],[["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/2paf-s82-yieu.js","async":true}],["$","script","script-1",{"src":"/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","async":true}],["$","script","script-2",{"src":"/qiguanui-registry/_next/static/chunks/3rbg903o3gv2t.js","async":true}],["$","script","script-3",{"src":"/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js","async":true}],["$","script","script-4",{"src":"/qiguanui-registry/_next/static/chunks/1kzft7qzzohcx.js","async":true}],["$","script","script-5",{"src":"/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","async":true}],["$","script","script-6",{"src":"/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","async":true}],["$","script","script-7",{"src":"/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","async":true}],["$","script","script-8",{"src":"/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","async":true}],["$","script","script-9",{"src":"/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","async":true}],["$","script","script-10",{"src":"/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","async":true}],["$","script","script-11",{"src":"/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js","async":true}]],["$","$L6",null,{"children":["$","$7",null,{"name":"Next.MetadataOutlet","children":"$@8"}]}]]}],"isPartial":"$@9","staleTime":"$a","varyParams":null},{"rsc":["$","$1","h",{"children":[null,["$","$Lb",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$Lc",null,{"children":["$","$7",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"AI风控平台"}],["$","meta","1",{"name":"description","content":"AI公司全视图管理系统"}],["$","link","2",{"rel":"icon","href":"/qiguanui-registry/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$Ld","3",{}]]}]}]}],null]}],"isPartial":"$@e","staleTime":"$a","varyParams":null},{"rsc":["$","$1","c",{"children":[null,["$","$Lf",null,{"parallelRouterKey":"children","template":["$","$L10",null,{}]}]]}],"isPartial":"$@11","staleTime":"$a","varyParams":"$12"}],"isUpgradeableISRFallback":false,"a":"$@13","rootVaryParams":null,"needsRuntimeRequest":"$@14"}
+4:{}
+5:"$0:data:0:rsc:props:children:0:props:serverProvidedParams:params"
+8:null
+14:true
+a:300
+a:C
+13:0
+e:"$undefined"
+11:"$undefined"
+9:"$undefined"

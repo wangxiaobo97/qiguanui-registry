@@ -1,0 +1,132 @@
+1:"$Sreact.fragment"
+2:I[522016,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js"],""]
+3:I[576697,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js"],"BrowserFrame"]
+4:I[222506,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js"],"CodeBlock"]
+5:Tb5d,// app/my-page/page.tsx
+"use client";
+
+import { QiCircleCheck, QiStack, QiWarningAlert } from "@qiguan/qingicon";
+
+import { AppShell } from "@/components/application/app-shell/app-shell";
+import { StatCards } from "@/components/application/dashboard/stat-cards";
+import {
+  RecordTable,
+  type RecordColumn,
+  type RecordFilter,
+} from "@/components/application/record-table/record-table";
+import { Chip } from "@/components/base/badges/chip";
+
+type Item = {
+  id: string;
+  name: string;
+  level: "高" | "中" | "低";
+  amount: number;
+};
+
+/** 列声明：不给 sortValue 就表示这列不可排序 */
+const columns: RecordColumn<Item>[] = [
+  {
+    id: "name",
+    header: "名称",
+    width: "w-[240px]",
+    isRowHeader: true,        // 行首列，react-aria 会读成行标题
+    sortValue: (r) => r.name,
+    cell: (r) => <span className="text-body-medium text-text-primary">{r.name}</span>,
+  },
+  {
+    id: "level",
+    header: "等级",
+    width: "w-[104px]",
+    sortValue: (r) => ["高", "中", "低"].indexOf(r.level),
+    cell: (r) => (
+      <Chip variant="subtle" color={r.level === "高" ? "rose" : "yellow"}>
+        {r.level}
+      </Chip>
+    ),
+  },
+  {
+    id: "amount",
+    header: "金额",
+    width: "w-[120px]",
+    sortValue: (r) => r.amount,
+    cell: (r) => (
+      <span className="text-body-medium tabular-nums text-text-primary">
+        {r.amount.toLocaleString("zh-CN")} 元
+      </span>
+    ),
+  },
+];
+
+/** 工具栏下拉筛选（不是查询表单 —— 字段一多就该换 FilterBar） */
+const filters: RecordFilter<Item>[] = [
+  {
+    id: "level",
+    ariaLabel: "按等级筛选",
+    allLabel: "全部等级",
+    options: ["高", "中", "低"],
+    match: (r, value) => r.level === value,
+  },
+];
+
+const rows: Item[] = [
+  { id: "1", name: "示例条目一", level: "高", amount: 480000 },
+  { id: "2", name: "示例条目二", level: "中", amount: 70000 },
+];
+
+export default function MyPage() {
+  return (
+    <AppShell heading="我的台账">
+      {/* 全站水平节奏 10px：卡片之间一律 gap 10 */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <StatCards
+          stats={[
+            { icon: QiStack, label: "总条数", value: String(rows.length), delta: "+3 条", deltaColor: "lime" },
+            { icon: QiWarningAlert, label: "高风险", value: "1", delta: "+0.2%", deltaColor: "rose" },
+            { icon: QiCircleCheck, label: "已完成", value: "0", delta: "—", deltaColor: "neutral" },
+          ]}
+        />
+
+        <RecordTable<Item>
+          ariaLabel="我的台账"
+          unit="条"
+          columns={columns}
+          rows={rows}
+          filters={filters}
+          searchText={(r) => r.name}
+          searchPlaceholder="搜索名称"
+          rowMenuLabel={(r) => r.name}
+          pageSize={10}
+          minWidth={980}
+        />
+      </div>
+    </AppShell>
+  );
+}b:X
+10:X
+10:C
+0:{"buildId":"ZxYWgno_BwMKChaH2H226","data":[{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"flex flex-col gap-3","children":[["$","nav",null,{"className":"flex w-full min-w-0 flex-1 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden","children":["$","ol",null,{"className":"flex items-center gap-1.5 whitespace-nowrap","children":[["$","li",null,{"className":"flex items-center","children":["$","$L2",null,{"href":"/docs/pages","className":"-mx-1 flex items-center gap-1.5 rounded-md px-1 py-0.5 text-caption-1-medium text-text-tertiary transition-colors duration-150 ease hover:bg-background-primary-hover hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":"模板"}]}],["$","li",null,{"aria-hidden":true,"className":"text-caption-1-medium text-text-tertiary","children":"/"}],["$","li",null,{"className":"flex items-center gap-1.5 text-caption-1-medium whitespace-nowrap text-text-secondary","children":"客户台账"}]]}]}],["$","header",null,{"className":"flex flex-col gap-3","children":[["$","h1",null,{"className":"text-title-1-medium text-text-primary","children":"客户台账"}],["$","p",null,{"className":"text-headline-medium text-balance text-text-secondary","children":"台账页：KPI 卡 + 筛选 + 可分页台账。"}]]}],["$","section",null,{"id":"预览","className":"flex scroll-mt-14 flex-col gap-2 pt-10","children":[["$","h2",null,{"className":"text-title-2-medium text-text-primary","children":"预览"}],["$","div",null,{"className":"flex flex-col gap-4","children":[null,["$","$L3",null,{"src":"/customers","title":"客户台账"}]]}]]}],["$","section",null,{"id":"完整代码","className":"flex scroll-mt-14 flex-col gap-2 pt-10","children":[["$","h2",null,{"className":"text-title-2-medium text-text-primary","children":"完整代码"}],["$","div",null,{"className":"flex flex-col gap-4","children":[null,["$","$L4",null,{"code":"$5","label":"page.tsx"}]]}]]}],"$L6","$L7"]}],["$L8"],"$L9"]}],"isPartial":"$@a","staleTime":"$b","varyParams":null},{"rsc":"$Lc","isPartial":"$@d","staleTime":"$b","varyParams":null},{"rsc":"$Le","isPartial":"$@f","staleTime":"$b","varyParams":"$10"},{"rsc":"$L11","isPartial":"$@12","staleTime":"$b","varyParams":"$10"},{"rsc":"$L13","isPartial":"$@14","staleTime":"$b","varyParams":"$10"}],"isUpgradeableISRFallback":false,"a":"$@15","rootVaryParams":null,"needsRuntimeRequest":"$@16"}
+17:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"OutletBoundary"]
+18:"$Sreact.suspense"
+1a:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"ViewportBoundary"]
+1b:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"MetadataBoundary"]
+1c:I[27201,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"IconMark"]
+1d:I[339756,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+1e:I[837457,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+6:["$","section",null,{"id":"注意","className":"flex scroll-mt-14 flex-col gap-2 pt-10","children":[["$","h2",null,{"className":"text-title-2-medium text-text-primary","children":"注意"}],["$","div",null,{"className":"flex flex-col gap-4","children":[null,["$","ul",null,{"className":"flex flex-col gap-2.5","children":[["$","li","0",{"className":"flex gap-3","children":[["$","span",null,{"className":"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-background-tertiary-default text-[11px] font-medium text-text-secondary","children":1}],["$","span",null,{"className":"text-body-regular text-text-secondary","children":"StatCards 至少 3 张、最多 4 张；数量不对会让卡片被拉宽变形。"}]]}],["$","li","1",{"className":"flex gap-3","children":[["$","span",null,{"className":"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-background-tertiary-default text-[11px] font-medium text-text-secondary","children":2}],["$","span",null,{"className":"text-body-regular text-text-secondary","children":"RecordTable 的 filters 与 FilterBar 二选一，不要同时开 —— 会出现两处筛选互相打架。"}]]}],["$","li","2",{"className":"flex gap-3","children":[["$","span",null,{"className":"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-background-tertiary-default text-[11px] font-medium text-text-secondary","children":3}],["$","span",null,{"className":"text-body-regular text-text-secondary","children":"金额列加 tabular-nums，否则数字宽度不一致，竖排看起来会歪。"}]]}]]}]]}]]}]
+7:["$","nav",null,{"className":"mt-6 flex items-center justify-between gap-4 border-t border-separator-border pt-5","children":[["$","span",null,{}],["$","$L2",null,{"href":"/docs/pages/opportunity","className":"group flex flex-col items-end rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":[["$","span",null,{"className":"text-caption-1-medium text-text-tertiary","children":"下一页"}],["$","span",null,{"className":"text-body-medium text-text-secondary transition-colors group-hover:text-text-primary","children":"商机详情"}]]}]]}]
+8:["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js","async":true}]
+9:["$","$L17",null,{"children":["$","$18",null,{"name":"Next.MetadataOutlet","children":"$@19"}]}]
+c:["$","$1","h",{"children":[null,["$","$L1a",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L1b",null,{"children":["$","$18",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"客户台账 · QiguanUI"}],["$","meta","1",{"name":"description","content":"台账页：KPI 卡 + 筛选 + 可分页台账。"}],["$","link","2",{"rel":"icon","href":"/qiguanui-registry/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L1c","3",{}]]}]}]}],null]}]
+e:["$","$1","c",{"children":[null,["$","$L1d",null,{"parallelRouterKey":"children","template":["$","$L1e",null,{}]}]]}]
+11:["$","$1","c",{"children":[null,["$","$L1d",null,{"parallelRouterKey":"children","template":["$","$L1e",null,{}]}]]}]
+13:["$","$1","c",{"children":[null,["$","$L1d",null,{"parallelRouterKey":"children","template":["$","$L1e",null,{}]}]]}]
+16:true
+19:null
+b:300
+b:C
+15:0
+d:"$undefined"
+f:"$undefined"
+12:"$undefined"
+14:"$undefined"
+a:"$undefined"

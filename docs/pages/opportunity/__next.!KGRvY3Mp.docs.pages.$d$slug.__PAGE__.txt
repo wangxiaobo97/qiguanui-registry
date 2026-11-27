@@ -1,0 +1,89 @@
+1:"$Sreact.fragment"
+2:I[522016,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js"],""]
+3:I[576697,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js"],"BrowserFrame"]
+4:I[222506,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js"],"CodeBlock"]
+5:T6b7,// app/rules/[id]/page.tsx
+"use client";
+
+import {
+  DetailPage,
+  DetailHeader,
+  DetailSection,
+  DetailItem,
+} from "@/components/application/detail-page/detail-page";
+import { Chip } from "@/components/base/badges/chip";
+import { Button } from "@/components/base/buttons/button";
+
+const rule = {
+  name: "大额转账二次核验",
+  code: "R-2026-0114",
+  level: "高",
+  owner: "张明",
+  effective: "2026-11-01",
+  updated: "2026-11-12 14:30",
+  scope: "全部对公账户",
+  trigger: "单笔对公转账金额 ≥ 50 万元，且收款方不在白名单内",
+  exception: "节假日顺延至下一工作日",
+  reviewer: "李静",
+};
+
+export default function RuleDetailPage() {
+  return (
+    <DetailPage heading="规则详情">
+      <DetailHeader
+        title={rule.name}
+        badge={<Chip variant="subtle" color="rose">{rule.level}</Chip>}
+        meta={`规则编号 ${rule.code} · 最近更新 ${rule.updated}`}
+        actions={
+          <>
+            <Button variant="secondary" size="small">编辑</Button>
+            <Button variant="primary" size="small">提交审核</Button>
+          </>
+        }
+      />
+
+      <DetailSection title="基本信息">
+        <DetailItem label="责任人" value={rule.owner} />
+        <DetailItem label="生效日期" value={rule.effective} />
+        <DetailItem label="适用范围" value={rule.scope} />
+      </DetailSection>
+
+      <DetailSection title="判定说明" columns={2}>
+        <DetailItem label="触发条件" value={rule.trigger} className="md:col-span-2" />
+        <DetailItem label="例外情况" value={rule.exception} />
+        <DetailItem label="复核人" value={rule.reviewer} />
+      </DetailSection>
+    </DetailPage>
+  );
+}e:X
+13:X
+13:C
+0:{"buildId":"ZxYWgno_BwMKChaH2H226","data":[{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"flex flex-col gap-3","children":[["$","nav",null,{"className":"flex w-full min-w-0 flex-1 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden","children":["$","ol",null,{"className":"flex items-center gap-1.5 whitespace-nowrap","children":[["$","li",null,{"className":"flex items-center","children":["$","$L2",null,{"href":"/docs/pages","className":"-mx-1 flex items-center gap-1.5 rounded-md px-1 py-0.5 text-caption-1-medium text-text-tertiary transition-colors duration-150 ease hover:bg-background-primary-hover hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":"模板"}]}],["$","li",null,{"aria-hidden":true,"className":"text-caption-1-medium text-text-tertiary","children":"/"}],["$","li",null,{"className":"flex items-center gap-1.5 text-caption-1-medium whitespace-nowrap text-text-secondary","children":"商机详情"}]]}]}],["$","header",null,{"className":"flex flex-col gap-3","children":[["$","h1",null,{"className":"text-title-1-medium text-text-primary","children":"商机详情"}],["$","p",null,{"className":"text-headline-medium text-balance text-text-secondary","children":"顶部状态头卡 + 若干描述卡。"}]]}],["$","section",null,{"id":"预览","className":"flex scroll-mt-14 flex-col gap-2 pt-10","children":[["$","h2",null,{"className":"text-title-2-medium text-text-primary","children":"预览"}],["$","div",null,{"className":"flex flex-col gap-4","children":[null,["$","$L3",null,{"src":"/opportunity","title":"商机详情"}]]}]]}],["$","section",null,{"id":"完整代码","className":"flex scroll-mt-14 flex-col gap-2 pt-10","children":[["$","h2",null,{"className":"text-title-2-medium text-text-primary","children":"完整代码"}],["$","div",null,{"className":"flex flex-col gap-4","children":[null,["$","$L4",null,{"code":"$5","label":"page.tsx"}]]}]]}],["$","section",null,{"id":"注意","className":"flex scroll-mt-14 flex-col gap-2 pt-10","children":[["$","h2",null,{"className":"text-title-2-medium text-text-primary","children":"注意"}],["$","div",null,{"className":"flex flex-col gap-4","children":[null,["$","ul",null,{"className":"flex flex-col gap-2.5","children":[["$","li","0",{"className":"flex gap-3","children":["$L6","$L7"]}],"$L8","$L9"]}]]}]]}],"$La"]}],["$Lb"],"$Lc"]}],"isPartial":"$@d","staleTime":"$e","varyParams":null},{"rsc":"$Lf","isPartial":"$@10","staleTime":"$e","varyParams":null},{"rsc":"$L11","isPartial":"$@12","staleTime":"$e","varyParams":"$13"},{"rsc":"$L14","isPartial":"$@15","staleTime":"$e","varyParams":"$13"},{"rsc":"$L16","isPartial":"$@17","staleTime":"$e","varyParams":"$13"}],"isUpgradeableISRFallback":false,"a":"$@18","rootVaryParams":null,"needsRuntimeRequest":"$@19"}
+1a:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"OutletBoundary"]
+1b:"$Sreact.suspense"
+1d:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"ViewportBoundary"]
+1e:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"MetadataBoundary"]
+1f:I[27201,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"IconMark"]
+20:I[339756,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+21:I[837457,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+6:["$","span",null,{"className":"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-background-tertiary-default text-[11px] font-medium text-text-secondary","children":1}]
+7:["$","span",null,{"className":"text-body-regular text-text-secondary","children":"DetailItem 渲染的是 dt + dd，不要用 div 套 span 自己拼 —— 读屏会念不出键值对应关系。"}]
+8:["$","li","1",{"className":"flex gap-3","children":[["$","span",null,{"className":"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-background-tertiary-default text-[11px] font-medium text-text-secondary","children":2}],["$","span",null,{"className":"text-body-regular text-text-secondary","children":"DetailHeader 的右侧操作区最多两个按钮，多的收进行内菜单。"}]]}]
+9:["$","li","2",{"className":"flex gap-3","children":[["$","span",null,{"className":"mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-background-tertiary-default text-[11px] font-medium text-text-secondary","children":3}],["$","span",null,{"className":"text-body-regular text-text-secondary","children":"columns={2} 的卡片里，单值想占满要用 md:col-span-2。"}]]}]
+a:["$","nav",null,{"className":"mt-6 flex items-center justify-between gap-4 border-t border-separator-border pt-5","children":[["$","$L2",null,{"href":"/docs/pages/customers","className":"group flex flex-col rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":[["$","span",null,{"className":"text-caption-1-medium text-text-tertiary","children":"上一页"}],["$","span",null,{"className":"text-body-medium text-text-secondary transition-colors group-hover:text-text-primary","children":"客户台账"}]]}],["$","$L2",null,{"href":"/docs/pages/overview","className":"group flex flex-col items-end rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":[["$","span",null,{"className":"text-caption-1-medium text-text-tertiary","children":"下一页"}],["$","span",null,{"className":"text-body-medium text-text-secondary transition-colors group-hover:text-text-primary","children":"概览看板"}]]}]]}]
+b:["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/2-om79kw06ewf.js","async":true}]
+c:["$","$L1a",null,{"children":["$","$1b",null,{"name":"Next.MetadataOutlet","children":"$@1c"}]}]
+f:["$","$1","h",{"children":[null,["$","$L1d",null,{"children":[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]}],["$","div",null,{"hidden":true,"children":["$","$L1e",null,{"children":["$","$1b",null,{"name":"Next.Metadata","children":[["$","title","0",{"children":"商机详情 · QiguanUI"}],["$","meta","1",{"name":"description","content":"顶部状态头卡 + 若干描述卡。"}],["$","link","2",{"rel":"icon","href":"/qiguanui-registry/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L1f","3",{}]]}]}]}],null]}]
+11:["$","$1","c",{"children":[null,["$","$L20",null,{"parallelRouterKey":"children","template":["$","$L21",null,{}]}]]}]
+14:["$","$1","c",{"children":[null,["$","$L20",null,{"parallelRouterKey":"children","template":["$","$L21",null,{}]}]]}]
+16:["$","$1","c",{"children":[null,["$","$L20",null,{"parallelRouterKey":"children","template":["$","$L21",null,{}]}]]}]
+19:true
+1c:null
+e:300
+e:C
+18:0
+10:"$undefined"
+12:"$undefined"
+15:"$undefined"
+17:"$undefined"
+d:"$undefined"

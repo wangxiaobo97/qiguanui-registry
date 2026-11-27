@@ -1,0 +1,222 @@
+1:"$Sreact.fragment"
+c:I[253348,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/1o2zw9_6oalrm.js"],"default"]
+:HL["/qiguanui-registry/_next/static/chunks/2z119tm0jom19.css","style"]
+2:T2219,(function(){
+var K_AT="__qiguan_reload_at";
+var K_N="__qiguan_reload_count";
+var K_WHY="__qiguan_reload_reason";
+var K_WORST="__qiguan_worst_task";
+var HYDRATED="data-qiguan-hydrated";
+var P_BUST="__qiguan_r";
+var MSG_SYNC="页面与服务器不同步，正在重新加载…";
+var MSG_BLANK="页面未正常显示，正在重新加载…";
+var BASE_MS=8000, EMPTY_MS=800, HYDRATE_MS=12000, EMPTY_MAX=2, MAX_SHIFT=4;
+/* 判据 B（屏幕是空的）的参数：元素数下限、起测延时、轮询间隔、轮询次数上限 */
+var BLANK_MIN_DOM=10, BLANK_START_MS=3000, BLANK_PROBE_MS=1500, BLANK_MAX_PROBES=20;
+function num(k){try{return Number(sessionStorage.getItem(k)||0)||0;}catch(e){return 0;}}
+function canReload(){
+  var wait=BASE_MS*Math.pow(2,Math.min(num(K_N),MAX_SHIFT));
+  return Date.now()-num(K_AT)>=wait;
+}
+/* 带 cache-bust 参数的地址：避免非强制 reload 取回本地缓存的旧 HTML。
+   与 boot-guard-script.ts 的 cacheBustUrl() 等价，改一处要改两处。 */
+function bustUrl(){
+  try{
+    var u=new URL(location.href);
+    u.searchParams.set(P_BUST,String(Date.now()));
+    return u.toString();
+  }catch(e){
+    var raw=String(location.href).split("#")[0];
+    return raw+(raw.indexOf("?")>=0?"&":"?")+P_BUST+"="+Date.now();
+  }
+}
+function domCount(){
+  try{ return document.body?document.body.querySelectorAll("*").length:0; }catch(e){ return 0; }
+}
+/* 内容是否真的"画"出来了（而不只是"存在于 DOM 里"）。
+   display:none / visibility:hidden / opacity:0 都会判为不可见 —— 这正是判据 B 要抓的。
+   ⚠️ 浏览器不支持 checkVisibility 时一律返回 true：宁可漏报，绝不误报。 */
+function hasVisibleContent(){
+  try{
+    if(!document.body) return true;
+    var els=document.body.querySelectorAll("*");
+    var n=els.length; if(n>6000) n=6000;
+    for(var i=0;i<n;i++){
+      var e=els[i];
+      if(typeof e.checkVisibility!=="function") return true;
+      if(!e.checkVisibility({checkVisibilityCSS:true,checkOpacity:true})) continue;
+      if((e.textContent||"").trim().length>0) return true;
+    }
+    return false;
+  }catch(err){ return true; }
+}
+var notified=false;
+/* 写提示。⚠️ 只有两个调用点（body-emptied / screen-blank），两种情况页面都已经没法看了，
+   所以这里**无条件清空 body 再写** —— 这样提示一定看得见。
+   （早先这里有一道"只有 body 为空才写"的守卫，判据 B 加进来后它会把提示整个挡掉：
+   那种状态下 DOM 有好几百个元素。）
+   还必须把 html/body 也强制设成可见：判据 B 的成因就是"整页被隐藏"，
+   不这么做的话提示会被一起隐藏，等于没写。 */
+function notice(msg,url){
+  try{
+    if(!document.body)return;
+    notified=true;
+    try{
+      var d=document.documentElement, b=document.body;
+      d.style.setProperty("visibility","visible","important");
+      d.style.setProperty("opacity","1","important");
+      d.style.setProperty("display","block","important");
+      b.style.setProperty("visibility","visible","important");
+      b.style.setProperty("opacity","1","important");
+      b.style.setProperty("display","block","important");
+      b.style.setProperty("position","static","important");
+      b.style.setProperty("overflow","visible","important");
+    }catch(e){}
+    document.body.innerHTML="";
+    var box=document.createElement("div");
+    box.setAttribute("style","position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;visibility:visible;opacity:1;background:#F5F7FA;font:14px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#5F5E5A;padding:24px;text-align:center");
+    box.appendChild(document.createTextNode(msg));
+    var a=document.createElement("a");
+    a.setAttribute("href",url);
+    a.setAttribute("style","color:#185FA5;text-decoration:underline;visibility:visible;opacity:1");
+    a.appendChild(document.createTextNode("手动重试"));
+    box.appendChild(a);
+    document.body.appendChild(box);
+  }catch(e){}
+}
+function reloadOnce(why){
+  if(!canReload())return;
+  try{
+    sessionStorage.setItem(K_AT,String(Date.now()));
+    sessionStorage.setItem(K_N,String(num(K_N)+1));
+    sessionStorage.setItem(K_WHY,String(why));
+  }catch(e){}
+  try{console.warn("[qiguan] page needs reload: "+why);}catch(e){}
+  var url=bustUrl();
+  if(why.indexOf("body-emptied")===0){ notice(MSG_SYNC,url); }
+  else if(why.indexOf("screen-blank")===0){ notice(MSG_BLANK,url); }
+  location.replace(url);
+}
+var PAT=/ChunkLoadError|Loading chunk [^ ]+ failed|Failed to fetch dynamically imported module|Importing a module script failed|Failed to fetch RSC payload|Connection closed/i;
+window.addEventListener("error",function(e){
+  var t=e&&e.target;
+  if(t&&t.tagName==="SCRIPT"&&t.src&&t.src.indexOf("/_next/static/")>=0){reloadOnce("script-src");return;}
+  var m=(e&&e.message)||"";
+  if(PAT.test(String(m)))reloadOnce("error:"+String(m).slice(0,60));
+},true);
+window.addEventListener("unhandledrejection",function(e){
+  var r=e&&e.reason;
+  var m=(r&&((r.name||"")+": "+(r.message||"")))||String(r||"");
+  if(PAT.test(m))reloadOnce("rejection:"+m.slice(0,60));
+});
+function watch(){
+  if(!document.body)return;
+  var emptySince=0,pending=false,obs=null;
+  function check(){
+    pending=false;
+    if(notified)return;
+    if(!document.body)return;
+    var n=document.body.querySelectorAll("*").length;
+    if(n<=EMPTY_MAX){
+      if(!emptySince){
+        emptySince=Date.now();
+        // 关键：掏空后页面会进入"静止"（不再有 DOM 变动），不主动安排一次复查，
+        // "持续 EMPTY_MS"这个条件就永远不会被求值。（实测打脸后补上的一条。）
+        setTimeout(check,EMPTY_MS+120);
+        return;
+      }
+      if(Date.now()-emptySince>=EMPTY_MS){if(obs)obs.disconnect();reloadOnce("body-emptied("+n+")");}
+    }else{emptySince=0;}
+  }
+  obs=new MutationObserver(function(){
+    if(pending)return;
+    pending=true;
+    setTimeout(check,120);
+  });
+  obs.observe(document.body,{childList:true,subtree:true});
+  check();
+  setTimeout(function(){
+    // 资源都拉完了还没水合，才算"React 起不来"；否则慢网络上的正常加载会被误判。
+    if(document.readyState!=="complete")return;
+    if(document.visibilityState!=="visible")return;
+    if(document.documentElement.getAttribute(HYDRATED)!=="1")reloadOnce("never-hydrated");
+  },HYDRATE_MS);
+  /* 判据 B：DOM 齐全但屏幕上什么都没有。
+     ⚠️ 必须**有界轮询**而不是只探两次 —— 用户报的正是"动不动"（间歇性），
+     白屏可能发生在加载后任意时刻；只探两次会漏掉探测窗口之后才出现的。
+     但也不能无限轮询（每次都要过一遍 checkVisibility），所以 20 次 × 1.5 秒后收工，
+     由 ChunkReloadGuard 接手已水合之后的场景。 */
+  var strikes=0,blankProbes=0;
+  function probeBlank(){
+    if(notified)return;
+    if(document.visibilityState!=="visible")return;
+    var n=domCount();
+    if(n<BLANK_MIN_DOM)return;              // 元素太少 -> 归判据 A 管
+    if(hasVisibleContent()){strikes=0;return;}
+    strikes++;
+    if(strikes>=2){if(obs)obs.disconnect();reloadOnce("screen-blank("+n+")");}
+  }
+  function startBlankWatch(){
+    setTimeout(function tick(){
+      if(notified)return;
+      probeBlank();
+      blankProbes++;
+      if(blankProbes<BLANK_MAX_PROBES)setTimeout(tick,BLANK_PROBE_MS);
+    },BLANK_START_MS);
+  }
+  if(document.readyState==="complete"){startBlankWatch();}
+  else{document.addEventListener("readystatechange",function h(){
+    if(document.readyState==="complete"){document.removeEventListener("readystatechange",h);startBlankWatch();}
+  });}
+}
+/* 主线程健康度留痕：把**最差的一次长任务**（>50ms 才会上报）写进 sessionStorage。
+   用途见文件头「卡死」一节：这类故障只在用户那台机器上出现，必须让页面自己记下来，
+   否则我永远只能"干净浏览器里看一切正常"。成本：一个 PerformanceObserver，无副作用。 */
+try{
+  if(window.PerformanceObserver){
+    var worstTask=0;
+    var po=new PerformanceObserver(function(list){
+      var es=list.getEntries();
+      for(var i=0;i<es.length;i++){
+        var d=Math.round(es[i].duration||0);
+        if(d>worstTask){
+          worstTask=d;
+          try{sessionStorage.setItem(K_WORST,d+"ms@"+Math.round(performance.now())+"@"+String(es[i].name||""));}catch(x){}
+        }
+      }
+    });
+    po.observe({entryTypes:["longtask"]});
+  }
+}catch(e){}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",watch);}else{watch();}
+})();a:X
+0:{"P":null,"c":["","docs","components","textarea",""],"q":"","i":false,"f":[[["",{"children":["(docs)",{"children":["docs",{"children":["components",{"children":[["slug","textarea","d",[]],{"children":["__PAGE__",{},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4608]},"$undefined","$undefined",4624],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/qiguanui-registry/_next/static/chunks/2z119tm0jom19.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"zh-CN","children":["$","body",null,{"children":[["$","script",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3","$L4"]}]}]]}],{"children":["$L5",{"children":["$L6",{"children":["$L7",{"children":["$L8",{"children":["$L9",{},null,false,null]},null,false,"$a"]},null,false,"$a"]},null,false,"$a"]},null,false,null]},null,false,null],"$Lb",false]],"m":"$undefined","G":["$c",["$Ld"]],"S":true,"h":null,"r":"$undefined","s":"$undefined","a":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"ZxYWgno_BwMKChaH2H226"}
+e:I[594852,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"ChunkReloadGuard"]
+f:I[112654,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"AppI18nProvider"]
+10:I[339756,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+11:I[408821,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2qp-hikz2mq-j.js"],"default"]
+12:I[837457,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"default"]
+13:I[522016,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/12i134x6mcnzr.js","/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","/qiguanui-registry/_next/static/chunks/2uimvxqh-nplp.js","/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","/qiguanui-registry/_next/static/chunks/155-ui2_snz2j.js","/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js","/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","/qiguanui-registry/_next/static/chunks/34-_k_mwo5oue.js","/qiguanui-registry/_next/static/chunks/31dial7gqzyeo.js","/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js"],""]
+14:I[356308,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/12i134x6mcnzr.js","/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","/qiguanui-registry/_next/static/chunks/2uimvxqh-nplp.js","/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","/qiguanui-registry/_next/static/chunks/155-ui2_snz2j.js","/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js","/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","/qiguanui-registry/_next/static/chunks/34-_k_mwo5oue.js","/qiguanui-registry/_next/static/chunks/31dial7gqzyeo.js","/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js"],"DocNav"]
+17:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"OutletBoundary"]
+18:"$Sreact.suspense"
+1a:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"ViewportBoundary"]
+1c:I[897367,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"MetadataBoundary"]
+3:["$","$Le",null,{}]
+4:["$","$Lf",null,{"children":["$","$L10",null,{"parallelRouterKey":"children","error":"$11","errorStyles":[],"errorScripts":[["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/2qp-hikz2mq-j.js","async":true,"nonce":"$undefined"}]],"template":["$","$L12",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","div",null,{"className":"flex min-h-[60vh] items-center justify-center p-6","children":["$","div",null,{"className":"w-full max-w-[480px] rounded-2xl border border-border-button-default bg-background-primary-default p-10 text-center","children":[["$","div",null,{"className":"mx-auto mb-5 flex size-16 items-center justify-center rounded-full bg-warning-bg text-[28px]","children":["$","span",null,{"aria-hidden":"true","children":"?"}]}],["$","h1",null,{"className":"m-0 mb-3 text-[18px] leading-7 font-semibold","children":"没有这个页面"}],["$","p",null,{"className":"m-0 mb-6 text-[13px] leading-6 text-text-secondary","children":"地址可能拼错了，或者这个功能已经改名。可以点下面的按钮回到项目台账。"}],["$","$L13",null,{"href":"/","className":"inline-block rounded-lg bg-primary-main px-4 py-2 text-[13px] font-medium text-white no-underline transition-colors hover:bg-primary-hover","children":"返回项目台账"}]]}]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]
+5:["$","$1","c",{"children":[[["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","async":true,"nonce":"$undefined"}]],["$","div",null,{"className":"flex min-h-screen w-full bg-background-full","children":[["$","aside",null,{"className":"sticky top-3 m-3 hidden h-[calc(100vh-24px)] w-[260px] shrink-0 flex-col gap-3 overflow-hidden rounded-3xl border border-border-button-white bg-background-secondary-default p-3 shadow-sidebar lg:flex","children":[["$","$L13",null,{"href":"/docs/components","className":"flex w-full items-center gap-2 rounded-md px-1 outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":[["$","span",null,{"className":"text-title-3-semibold text-text-primary","children":"QiguanUI"}],["$","span",null,{"className":"rounded-md bg-accent-50 px-1.5 py-0.5 text-[11px] leading-4 font-medium text-accent-600","children":"1.0 Beta"}]]}],["$","$L14",null,{"groups":[{"group":"快速入门","items":[{"href":"/docs/getting-started","name":"start-overview","title":"开始使用"},{"href":"/docs/getting-started/install","name":"start-install","title":"安装"},{"href":"/docs/getting-started/ai","name":"start-ai","title":"智能体接入"}]},{"group":"基础规范","items":[{"href":"/docs/foundations/colors","name":"foundation-colors","title":"颜色"},{"href":"/docs/foundations/typography","name":"foundation-type","title":"字体排版"},{"href":"/docs/components","name":"foundation-components","title":"组件"},{"href":"/docs/pages","name":"foundation-templates","title":"模板"}]},{"group":"基础组件","items":[{"href":"/docs/components/button","name":"button","title":"按钮","demo":false},{"href":"/docs/components/input","name":"input","title":"输入框","demo":false},{"href":"/docs/components/textarea","name":"textarea","title":"多行输入","demo":false},{"href":"/docs/components/number-field","name":"number-field","title":"数字输入","demo":false},{"href":"/docs/components/input-otp","name":"input-otp","title":"验证码输入","demo":false},{"href":"/docs/components/time-field","name":"time-field","title":"时间选择","demo":false},{"href":"/docs/components/search-field","name":"search-field","title":"搜索框","demo":false},{"href":"/docs/components/checkbox","name":"checkbox","title":"复选框","demo":false},{"href":"/docs/components/radio","name":"radio","title":"单选框","demo":false},{"href":"/docs/components/switch","name":"switch","title":"开关","demo":false},{"href":"/docs/components/slider","name":"slider","title":"滑块","demo":false},{"href":"/docs/components/select","name":"select","title":"下拉选择","demo":false},{"href":"/docs/components/combobox","name":"combobox","title":"组合框","demo":false},{"href":"/docs/components/date-picker","name":"date-picker","title":"日期选择","demo":false},{"href":"/docs/components/color-picker","name":"color-picker","title":"颜色选择","demo":false},{"href":"/docs/components/file-upload","name":"file-upload","title":"文件上传","demo":false},{"href":"/docs/components/segmented-control","name":"segmented-control","title":"分段控件","demo":false},{"href":"/docs/components/tag-group","name":"tag-group","title":"标签组","demo":false},{"href":"/docs/components/badge","name":"badge","title":"徽标","demo":false},{"href":"/docs/components/avatar","name":"avatar","title":"头像","demo":false},{"href":"/docs/components/table","name":"table","title":"表格","demo":false},{"href":"/docs/components/tree-view","name":"tree-view","title":"树形视图","demo":false},{"href":"/docs/components/pagination","name":"pagination","title":"分页","demo":false},{"href":"/docs/components/kbd","name":"kbd","title":"快捷键","demo":false},{"href":"/docs/components/meter","name":"meter","title":"量表","demo":false},{"href":"/docs/components/progress","name":"progress","title":"进度条","demo":false},{"href":"/docs/components/spinner","name":"spinner","title":"加载指示","demo":false},{"href":"/docs/components/skeleton","name":"skeleton","title":"骨架屏","demo":false},{"href":"/docs/components/divider","name":"divider","title":"分隔线","demo":false},{"href":"/docs/components/breadcrumb","name":"breadcrumb","title":"面包屑","demo":false},{"href":"/docs/components/modal","name":"modal","title":"模态框","demo":false},{"href":"/docs/components/drawer","name":"drawer","title":"抽屉","demo":false},{"href":"/docs/components/popover","name":"popover","title":"气泡层","demo":false},{"href":"/docs/components/tooltip","name":"tooltip","title":"文字提示","demo":false},{"href":"/docs/components/dropdown","name":"dropdown","title":"下拉菜单","demo":false},{"href":"/docs/components/context-menu","name":"context-menu","title":"右键菜单","demo":false},{"href":"/docs/components/toast","name":"toast","title":"轻提示","demo":false},{"href":"/docs/components/notification","name":"notification","title":"通知条","demo":false},{"href":"/docs/components/announcement","name":"announcement","title":"公告","demo":false},{"href":"/docs/components/command-palette","name":"command-palette","title":"命令面板","demo":false},{"href":"/docs/components/accordion","name":"accordion","title":"折叠面板","demo":false},{"href":"/docs/components/tabs","name":"tabs","title":"标签页","demo":false},{"href":"/docs/components/carousel","name":"carousel","title":"轮播","demo":false},{"href":"/docs/components/social-button","name":"social-button","title":"第三方登录","demo":false}]}]}]]}],"$L15"]}]]}]
+6:["$","$1","c",{"children":[null,["$","$L10",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L12",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+7:["$","$1","c",{"children":[null,["$","$L10",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L12",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+8:["$","$1","c",{"children":[null,["$","$L10",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L12",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+9:["$","$1","c",{"children":["$L16",[["$","script","script-0",{"src":"/qiguanui-registry/_next/static/chunks/12i134x6mcnzr.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","async":true,"nonce":"$undefined"}],["$","script","script-2",{"src":"/qiguanui-registry/_next/static/chunks/2uimvxqh-nplp.js","async":true,"nonce":"$undefined"}],["$","script","script-3",{"src":"/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","async":true,"nonce":"$undefined"}],["$","script","script-4",{"src":"/qiguanui-registry/_next/static/chunks/155-ui2_snz2j.js","async":true,"nonce":"$undefined"}],["$","script","script-5",{"src":"/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","async":true,"nonce":"$undefined"}],["$","script","script-6",{"src":"/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js","async":true,"nonce":"$undefined"}],["$","script","script-7",{"src":"/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","async":true,"nonce":"$undefined"}],["$","script","script-8",{"src":"/qiguanui-registry/_next/static/chunks/34-_k_mwo5oue.js","async":true,"nonce":"$undefined"}],["$","script","script-9",{"src":"/qiguanui-registry/_next/static/chunks/31dial7gqzyeo.js","async":true,"nonce":"$undefined"}],["$","script","script-10",{"src":"/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","async":true,"nonce":"$undefined"}],["$","script","script-11",{"src":"/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","async":true,"nonce":"$undefined"}],["$","script","script-12",{"src":"/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js","async":true,"nonce":"$undefined"}]],["$","$L17",null,{"children":["$","$18",null,{"name":"Next.MetadataOutlet","children":"$@19"}]}]]}]
+b:["$","$1","h",{"children":[null,["$","$L1a",null,{"children":"$L1b"}],["$","div",null,{"hidden":true,"children":["$","$L1c",null,{"children":["$","$18",null,{"name":"Next.Metadata","children":"$L1d"}]}]}],null]}]
+d:["$","link","0",{"rel":"stylesheet","href":"/qiguanui-registry/_next/static/chunks/2z119tm0jom19.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+1e:I[479914,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/12i134x6mcnzr.js","/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","/qiguanui-registry/_next/static/chunks/2uimvxqh-nplp.js","/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","/qiguanui-registry/_next/static/chunks/155-ui2_snz2j.js","/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js","/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","/qiguanui-registry/_next/static/chunks/34-_k_mwo5oue.js","/qiguanui-registry/_next/static/chunks/31dial7gqzyeo.js","/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js"],"DocToc"]
+a:C
+15:["$","div",null,{"className":"min-w-0 flex-1","children":["$","div",null,{"className":"mx-auto flex w-full max-w-[1240px] justify-center gap-10 px-6 pt-10 pb-14 sm:px-10","children":[["$","main",null,{"className":"flex w-full min-w-0 max-w-[900px] flex-col gap-3","children":["$","$L10",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L12",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","div",null,{"className":"flex min-h-[60vh] items-center justify-center p-6","children":["$","div",null,{"className":"w-full max-w-[480px] rounded-2xl border border-border-button-default bg-background-primary-default p-10 text-center","children":[["$","div",null,{"className":"mx-auto mb-5 flex size-16 items-center justify-center rounded-full bg-warning-bg text-[28px]","children":["$","span",null,{"aria-hidden":"true","children":"?"}]}],["$","h1",null,{"className":"m-0 mb-3 text-[18px] leading-7 font-semibold","children":"没有这个页面"}],["$","p",null,{"className":"m-0 mb-6 text-[13px] leading-6 text-text-secondary","children":"地址可能拼错了，或者这个功能已经改名。可以点下面的按钮回到项目台账。"}],["$","$L13",null,{"href":"/","className":"inline-block rounded-lg bg-primary-main px-4 py-2 text-[13px] font-medium text-white no-underline transition-colors hover:bg-primary-hover","children":"返回项目台账"}]]}]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}],["$","aside",null,{"className":"sticky top-10 hidden h-fit w-[180px] shrink-0 pt-4 xl:block","children":["$","$L1e",null,{}]}]]}]}]
+1f:I[693272,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js","/qiguanui-registry/_next/static/chunks/2f79q5bm1nq9k.js","/qiguanui-registry/_next/static/chunks/2jfo8stl54y2h.js","/qiguanui-registry/_next/static/chunks/12i134x6mcnzr.js","/qiguanui-registry/_next/static/chunks/0n58a4uulh5nf.js","/qiguanui-registry/_next/static/chunks/2uimvxqh-nplp.js","/qiguanui-registry/_next/static/chunks/1vryhu21g31cl.js","/qiguanui-registry/_next/static/chunks/155-ui2_snz2j.js","/qiguanui-registry/_next/static/chunks/37zg11a1_oxmu.js","/qiguanui-registry/_next/static/chunks/0-k4b0ocli13e.js","/qiguanui-registry/_next/static/chunks/1xrmduiqsvl3u.js","/qiguanui-registry/_next/static/chunks/34-_k_mwo5oue.js","/qiguanui-registry/_next/static/chunks/31dial7gqzyeo.js","/qiguanui-registry/_next/static/chunks/3a4do45loznpq.js","/qiguanui-registry/_next/static/chunks/41fk1ig7ldlez.js","/qiguanui-registry/_next/static/chunks/0xki_pz8qgci1.js"],"default"]
+16:["$","article",null,{"className":"flex flex-col gap-3","children":[["$","div",null,{"className":"flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between","children":["$","nav",null,{"className":"flex w-full min-w-0 flex-1 items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden","children":["$","ol",null,{"className":"flex items-center gap-1.5 whitespace-nowrap","children":[["$","li",null,{"className":"flex items-center","children":["$","$L13",null,{"href":"/docs/components","className":"-mx-1 flex items-center gap-1.5 rounded-md px-1 py-0.5 text-caption-1-medium text-text-tertiary transition-colors duration-150 ease hover:bg-background-primary-hover hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":"组件"}]}],["$","li",null,{"aria-hidden":true,"className":"text-caption-1-medium text-text-tertiary","children":"/"}],["$","li",null,{"className":"flex items-center gap-1.5 text-caption-1-medium whitespace-nowrap text-text-secondary","children":"多行输入"}]]}]}]}],["$","header",null,{"className":"flex flex-col gap-3","children":[["$","h1",null,{"className":"text-title-1-medium text-text-primary","children":"多行输入"}],["$","p",null,{"className":"text-headline-medium text-balance text-text-secondary","children":"可自适应高度的多行文本域，沿用输入框的标签与错误态规范。"}]]}],["$","$L1f",null,{}],["$","nav",null,{"className":"mt-6 flex items-center justify-between gap-4 border-t border-separator-border pt-5","children":[["$","$L13",null,{"href":"/docs/components/input","className":"group flex flex-col rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":[["$","span",null,{"className":"text-caption-1-medium text-text-tertiary","children":"上一页"}],["$","span",null,{"className":"text-body-medium text-text-secondary transition-colors group-hover:text-text-primary","children":"输入框"}]]}],["$","$L13",null,{"href":"/docs/components/number-field","className":"group flex flex-col items-end rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring","children":[["$","span",null,{"className":"text-caption-1-medium text-text-tertiary","children":"下一页"}],["$","span",null,{"className":"text-body-medium text-text-secondary transition-colors group-hover:text-text-primary","children":"数字输入"}]]}]]}]]}]
+1b:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+20:I[27201,["/qiguanui-registry/_next/static/chunks/1s2gw5ohs75va.js"],"IconMark"]
+19:null
+1d:[["$","title","0",{"children":"多行输入 · QiguanUI"}],["$","meta","1",{"name":"description","content":"可自适应高度的多行文本域，沿用输入框的标签与错误态规范。"}],["$","link","2",{"rel":"icon","href":"/qiguanui-registry/favicon.ico?favicon.2vob68tjqpejf.ico","sizes":"256x256","type":"image/x-icon"}],["$","$L20","3",{}]]
