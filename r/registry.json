@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "qiguanui",
-  "homepage": "https://wangxiaobo97.github.io/qiguanui-registry/docs",
+  "homepage": "https://wangxiaobo97.github.io/qiguanui-registry",
   "items": [
     {
       "name": "cx",
