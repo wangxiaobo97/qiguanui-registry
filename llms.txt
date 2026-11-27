@@ -2,7 +2,7 @@
 
 > 内部后台管理系统的设计系统。React 19 + Tailwind v4 + react-aria-components。
 > 它是本仓库的源码资产，不是 npm 包——`package.json` 里没有任何 UI 依赖。
-> 人读的完整手册在 `docs/USAGE.md`；本文件是给 AI 的紧凑索引，读完即可正确产出代码。
+> 本文件是给 AI 的紧凑索引，读完即可正确产出代码。
 
 ## 1. 怎么 import（读这一节就能开始干活）
 
