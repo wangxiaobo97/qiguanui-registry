@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "app-surface",
+  "type": "registry:lib",
+  "title": "卡片表面",
+  "description": "台账与详情卡共用的表面、内边距与间距常量。",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://wangxiaobo97.github.io/qiguanui-registry/r/cx.json",
+    "https://wangxiaobo97.github.io/qiguanui-registry/r/tokens.json"
+  ],
+  "files": [
+    {
+      "path": "components/application/card-surface.ts",
+      "type": "registry:component",
+      "target": "@components/application/card-surface.ts",
+      "content": "/**\n * 卡片表面与页面节奏 —— 全站业务卡片的**唯一定义**。\n *\n * ## 为什么要有这个文件\n *\n * 首页那三块（KPI 行 / 查询卡 / 结果卡）以及其余台账页的卡片，表面必须\n * 完全一致，否则并排时会读成\"两个不同的层级\"。在抽出这份常量之前，\n * `rounded-2xl border border-border-table bg-background-primary-default`\n * 这串 class 在各个组件里各抄了一遍 —— 改一次颜色要改三处，\n * 漏一处就会出现\"这张卡比旁边那张浅一点\"这种说不清的问题。\n *\n * 用法：\n *\n *   // 1) 卡片：表面常量 + 自己的内衬与圆角外的需求\n *   <section className={cx(CARD_SURFACE, CARD_INSET)}>…</section>\n *\n *   // 2) 卡片之间：节奏常量（Flex / Grid 都适用）\n *   <div className={cx(\"flex flex-col\", CARD_GAP)}>…</div>\n *\n * ## 2026-09-22 定下来的两条\n *\n * **① 卡片一律白底 + 描边。** 原先是「灰底无边框」\n * （`bg-background-secondary-default`，浅色下 #F3F4F6）。问题在于它与\n * 页面底 `#F5F7FA` 只差 1.5%，四种卡片并排时分不清哪个是\"卡\"、哪个是\n * \"背景\"。改成白底之后，卡片边界交给 `border-border-table` 交代 ——\n * 描边是一条能看见的线，比 1.5% 的色差可靠得多。\n *\n * **② 全站横向节奏 = 10px。** 外壳内衬、侧边栏到内容、卡片之间、卡片内衬、\n * 表格单元格横向内衬，全部对齐到 10px。于是\"从页面左边缘到任意卡片里的\n * 第一个字\"是 10 的整数倍，不会出现 12/16 混排导致的左右对不齐。\n * 纵向同样取 10px，模块之间读起来是同一个密度。\n *\n * ⚠️ 改了 `CARD_SURFACE` 记得同步验暗色：卡片白底靠\n * `--color-background-primary-default`，暗色下它自己会变成 neutral-800，\n * 不需要在这里写两套。但**卡内层表面**（KPI 卡图标底、页脚条）是另一对\n * token（`stat-card-icon-background` / `background-inner-default`），\n * 它们必须比卡片深一档 —— 见 `styles/theme.css` 里的注释。\n */\n\n/** 卡片表面：圆角 + 描边 + 白底。不含内衬与尺寸，由调用方补。 */\nexport const CARD_SURFACE =\n  \"rounded-2xl border border-border-table bg-background-primary-default\";\n\n/**\n * 卡片内衬 —— 10px 四周。\n *\n * 注意 `RecordTable` 的结果卡**故意不用它**：那张卡的横向 10px 由工具栏\n * 和每个单元格自己提供，卡片上再补一层会变成 20px 内缩，\n * 反而与相邻卡片的 10px 对不齐。展开见 `record-table.tsx` 的注释。\n */\nexport const CARD_INSET = \"p-2.5\";\n\n/** 卡片之间的间距 —— 纵向 10px（Flex 列方向；Grid 也适用作 gap）。 */\nexport const CARD_GAP = \"gap-2.5\";\n\n/** 与上面两条 class 对应的像素值，供行内样式（`style={{ gap }}`）使用。 */\nexport const CARD_RHYTHM_PX = 10;\n"
+    }
+  ]
+}

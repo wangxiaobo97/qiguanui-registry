@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lib-format-number",
+  "type": "registry:lib",
+  "title": "工具 · format-number",
+  "description": "被组件共用的 utils/format-number，安装引用它的组件时自动带入。",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "lib/format-number.ts",
+      "type": "registry:component",
+      "target": "@lib/format-number.ts",
+      "content": "/**\n * 千分位分组。\n *\n * **刻意不用 `toLocaleString()`**：它的输出由运行环境的 ICU 数据决定，\n * 服务端（Node）和浏览器可能给出不同的分组符（`1,234` / `1.234` / `1 234`）。\n * 同一份标记在两端渲染出两个字符串就是一次 hydration mismatch ——\n * 这是本项目反复踩到的同一类坑，数字格式化一律走这里。\n */\nexport function formatThousands(value: number): string {\n  return String(value).replace(/\\B(?=(\\d{3})+(?!\\d))/g, \",\");\n}\n"
+    }
+  ]
+}

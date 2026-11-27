@@ -1,0 +1,349 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "qiguanui",
+  "homepage": "https://wangxiaobo97.github.io/qiguanui-registry/docs",
+  "items": [
+    {
+      "name": "cx",
+      "type": "registry:lib",
+      "title": "cx / sortCx",
+      "description": "类名合并工具。cx 是已按 QiguanUI 字号工具类扩展过的 tailwind-merge；sortCx 仅用于编辑器内排序。"
+    },
+    {
+      "name": "qingicon",
+      "type": "registry:lib",
+      "title": "QingIcon 图标包装层",
+      "description": "把 qingicon-react 的默认线宽从 1.5 覆盖为 2。只含组件实际用到的图标。"
+    },
+    {
+      "name": "tokens",
+      "type": "registry:file",
+      "title": "设计变量与 Tailwind 主题",
+      "description": "全部语义色、字号档位与自定义工具类（Tailwind v4 的 @theme + @utility）。引入后组件类名才会生效。"
+    },
+    {
+      "name": "lib-format-number",
+      "type": "registry:lib",
+      "title": "工具 · format-number",
+      "description": "被组件共用的 utils/format-number，安装引用它的组件时自动带入。"
+    },
+    {
+      "name": "lib-use-dismiss-on-outside-press",
+      "type": "registry:lib",
+      "title": "工具 · use-dismiss-on-outside-press",
+      "description": "被组件共用的 utils/use-dismiss-on-outside-press，安装引用它的组件时自动带入。"
+    },
+    {
+      "name": "foundation-direction",
+      "type": "registry:lib",
+      "title": "基础件 · direction",
+      "description": "被多个组件共用的 foundations/direction，安装依赖它的组件时自动带入。"
+    },
+    {
+      "name": "foundation-chevrons",
+      "type": "registry:lib",
+      "title": "基础件 · icons",
+      "description": "被多个组件共用的 foundations/icons，安装依赖它的组件时自动带入。"
+    },
+    {
+      "name": "foundation-scroll-fade",
+      "type": "registry:lib",
+      "title": "基础件 · scroll-fade",
+      "description": "被多个组件共用的 foundations/scroll-fade，安装依赖它的组件时自动带入。"
+    },
+    {
+      "name": "foundation-template-copy",
+      "type": "registry:lib",
+      "title": "基础件 · template-copy",
+      "description": "被多个组件共用的 foundations/template-copy，安装依赖它的组件时自动带入。"
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "按钮",
+      "description": "三种尺寸的主要、次要、幽灵与危险变体，支持前后图标槽、仅图标方形模式，以及原生的悬停、按下与禁用状态。"
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "输入框",
+      "description": "带标签与提示文本的单行输入，覆盖默认、聚焦、错误、禁用四态，可配前后图标。"
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "多行输入",
+      "description": "可自适应高度的多行文本域，沿用输入框的标签与错误态规范。"
+    },
+    {
+      "name": "number-field",
+      "type": "registry:ui",
+      "title": "数字输入",
+      "description": "带加减步进按钮的数字输入，支持最小最大值、步长与键盘上下键。"
+    },
+    {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "验证码输入",
+      "description": "分格的一次性验证码输入，支持粘贴整串与自动跳格。"
+    },
+    {
+      "name": "time-field",
+      "type": "registry:ui",
+      "title": "时间选择",
+      "description": "按时/分/秒段选择的时间输入，键盘方向键可逐段调整。"
+    },
+    {
+      "name": "search-field",
+      "type": "registry:ui",
+      "title": "搜索框",
+      "description": "带搜索图标与清除按钮的查询输入，用于列表页顶部筛选。"
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "复选框",
+      "description": "支持单选、多选与半选（indeterminate）状态，含独立的分组用法。"
+    },
+    {
+      "name": "radio",
+      "type": "registry:ui",
+      "title": "单选框",
+      "description": "一组互斥选项，支持横向与纵向排布以及禁用态。"
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "开关",
+      "description": "二元状态的即时切换控件，用于设置项的开启与关闭。"
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "滑块",
+      "description": "在连续或分段区间内取值，可单值也可双端区间。"
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "下拉选择",
+      "description": "单选下拉，支持分组、搜索与虚拟滚动，基于 react-aria 的完整键盘交互。"
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "组合框",
+      "description": "可输入过滤的下拉选择，适合选项较多且需要检索的场景。"
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "日期选择",
+      "description": "日历面板与输入框结合的日期选择，支持区间与快捷选项。"
+    },
+    {
+      "name": "color-picker",
+      "type": "registry:ui",
+      "title": "颜色选择",
+      "description": "色板与自定义取色器，输出 hex 值。"
+    },
+    {
+      "name": "file-upload",
+      "type": "registry:ui",
+      "title": "文件上传",
+      "description": "拖拽或点击选择文件，带上传进度与文件列表。"
+    },
+    {
+      "name": "segmented-control",
+      "type": "registry:ui",
+      "title": "分段控件",
+      "description": "多个互斥视图的切换开关，带滑动指示块。"
+    },
+    {
+      "name": "tag-group",
+      "type": "registry:ui",
+      "title": "标签组",
+      "description": "可增删的标签集合，支持输入创建与键盘删除。"
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "徽标",
+      "description": "状态徽标与标签，含 Chip 与 StatusDot 两个同族变体，用于表达状态、分类与数量。"
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "头像",
+      "description": "单人或多人的头像，支持图片、首字母回退与堆叠。"
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "表格",
+      "description": "基础表格与排序、选择、空状态配合使用；功能全开的台账见 data-table 的完整示例。"
+    },
+    {
+      "name": "tree-view",
+      "type": "registry:ui",
+      "title": "树形视图",
+      "description": "可展开折叠的层级列表，支持多选与拖拽排序。"
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "分页",
+      "description": "页码、上一页/下一页与每页条数选择。"
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "快捷键",
+      "description": "键帽样式的快捷键提示，用于命令面板与提示文案。"
+    },
+    {
+      "name": "meter",
+      "type": "registry:ui",
+      "title": "量表",
+      "description": "带阈值刻度的用量表，用于容量、额度这类有上限的指标。"
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "进度条",
+      "description": "线形与环形进度，支持不确定态。"
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "加载指示",
+      "description": "小尺寸的旋转加载标识，用于按钮内或区块加载。"
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "骨架屏",
+      "description": "内容加载前的占位块，保持布局不跳动。"
+    },
+    {
+      "name": "divider",
+      "type": "registry:ui",
+      "title": "分隔线",
+      "description": "横向或纵向的分隔线，可带文字标签。"
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "面包屑",
+      "description": "层级路径导航，支持折叠与首页图标。"
+    },
+    {
+      "name": "modal",
+      "type": "registry:ui",
+      "title": "模态框",
+      "description": "居中弹窗，含标题、描述与操作区，支持尺寸档位与关闭方式控制。"
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "抽屉",
+      "description": "从侧边滑入的面板，适合承载表单与详情。"
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "气泡层",
+      "description": "锚定在触发元素旁的浮层容器，是下拉、菜单与提示的底座。"
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "文字提示",
+      "description": "悬停或聚焦时出现的简短说明，不承载交互元素。"
+    },
+    {
+      "name": "dropdown",
+      "type": "registry:ui",
+      "title": "下拉菜单",
+      "description": "带分组、分隔线与图标槽的动作菜单，支持多级与危险项。"
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "右键菜单",
+      "description": "在指定区域内右键唤出的上下文动作菜单。"
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "轻提示",
+      "description": "短期出现后自动消失的操作反馈，支持多种状态与操作按钮。"
+    },
+    {
+      "name": "notification",
+      "type": "registry:ui",
+      "title": "通知条",
+      "description": "页面内的横幅通知，含信息、成功、警告、错误四态。"
+    },
+    {
+      "name": "announcement",
+      "type": "registry:ui",
+      "title": "公告",
+      "description": "带图标与关闭按钮的公告条，用于版本更新与重要提示。"
+    },
+    {
+      "name": "command-palette",
+      "type": "registry:ui",
+      "title": "命令面板",
+      "description": "⌘K 唤出的全局搜索与命令执行面板，支持分组与快捷键提示。"
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "折叠面板",
+      "description": "可展开收起的若干区块，支持单开与多开模式。"
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "标签页",
+      "description": "页内视图切换，含下划线式与胶囊式（PillTab）两种形态。"
+    },
+    {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "轮播",
+      "description": "横向滑动的内容区，支持拖拽、分页点与前后按钮。"
+    },
+    {
+      "name": "social-button",
+      "type": "registry:ui",
+      "title": "第三方登录",
+      "description": "带品牌配色与标志的第三方账号登录按钮，内置常见服务商配置。"
+    },
+    {
+      "name": "app-surface",
+      "type": "registry:lib",
+      "title": "卡片表面",
+      "description": "台账与详情卡共用的表面、内边距与间距常量。"
+    },
+    {
+      "name": "app-filter-appearance",
+      "type": "registry:lib",
+      "title": "筛选控件外观",
+      "description": "台账工具栏里筛选控件共用的外观常量。"
+    },
+    {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "数据表格（功能全开）",
+      "description": "行选择、多维筛选、排序、分页、行操作都打开的一份完整参考实现。"
+    },
+    {
+      "name": "record-table",
+      "type": "registry:ui",
+      "title": "台账表格",
+      "description": "带搜索、筛选、排序、分页与行操作的台账表格。"
+    }
+  ]
+}

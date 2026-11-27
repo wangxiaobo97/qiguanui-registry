@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "app-filter-appearance",
+  "type": "registry:lib",
+  "title": "筛选控件外观",
+  "description": "台账工具栏里筛选控件共用的外观常量。",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://wangxiaobo97.github.io/qiguanui-registry/r/cx.json",
+    "https://wangxiaobo97.github.io/qiguanui-registry/r/tokens.json"
+  ],
+  "files": [
+    {
+      "path": "components/application/filters/filter-appearance.ts",
+      "type": "registry:component",
+      "target": "@components/application/filters/filter-appearance.ts",
+      "content": "/**\n * 筛选控件的外观约定 —— `FilterBar` 与各表格工具条（`RecordTable` / `DataTable` /\n * 设置·存储）共用这一份。\n *\n * 规则一：**同一行里所有控件的外壳高度必须相同**（`CONTROL_HEIGHT`）。\n * 规则二：**「全部」这一项语义上是\"未筛选\"，所以它必须与 Input 的\n * placeholder 同色**（都是\"没设置\"），而选了具体项才是近黑。\n *\n * 不这样做时，查询栏里会出现**三种深浅**，全都表示同一个\"还没设\"：\n * 「输入任务名称」浅灰 → 下拉框「全部类型」近黑 → 日期框「选择日期」近黑，\n * 于是整行看着深浅不一（2026-09-21 用户截图指出）。\n *\n * **为什么规则在这里、而不是改 `Select` / `Input` 的默认值**：\n * 只有调用方知道**\"哪一项是不限制\"** —— `selectedKey === \"all\"` 就是那句声明。\n * 改组件默认值会把真正显示选项的 Select 也一起变灰，那是另一个 bug。\n * 日期框不在此列：空态用 placeholder 色是组件自身的正确行为，\n * 已在 `date-picker.tsx` 按「有值 / 无值」分开取色，全站一致。\n */\n\n/**\n * 表单行 / 工具条里所有控件的统一外壳高度 —— **38px**。\n *\n * 为什么需要显式给按钮写死：组件库三种控件的 38px 是**算出来的**，不是声明的 ——\n *   外壳高 = 内容行高 20（`text-body-*` 的 line-height）+ 上下 padding 16 + 边框 2\n * `Input` / `Select` / `DatePicker` 都是这个式子，所以天然落在 38。\n * 唯独 `Button size=\"medium\"` 是 `h-9` **写死 36**（它得保住图标按钮的 36×36 正方\n * 契约）。于是在「查询栏」里，两个按钮比同行的输入框/下拉/日期框矮 2px。\n *\n * 为什么不反过来把三个控件压到 36：那要动组件库的 padding，会影响设置页、\n * 弹窗、全站每一处表单；而按钮只在\"与表单控件同行\"这一种场合需要长高，\n * 改一处即可。所以统一值取 38，由调用方补在按钮 / 搜索胶囊上。\n */\nexport const CONTROL_HEIGHT = \"h-[38px]\";\n\n/**\n * 工具条里那个圆角「搜索胶囊」的表面：灰底、无边框、圆角全包。\n *\n * 三处调用方（`RecordTable` / `DataTable` / 设置·存储）宽度逻辑各自不同\n * （是否 `flex-1` 撑满取决于父容器），所以只共享**形状与高度**，宽度留在调用处。\n */\nexport const SEARCH_PILL_SURFACE =\n  \"rounded-full bg-background-secondary-default h-[38px]\";\n\n/** 语义为「不限制 / 未筛选」的那一项的 key。 */\nexport const UNSET_KEY = \"all\";\n\n/** 未筛选时的文字档位，与 `Input` 的 `placeholder:text-text-tertiary` 同色。 */\nexport const UNSET_TEXT = \"text-text-tertiary\";\n\n/**\n * 给 `Select` 的 `triggerClassName`：未筛选时降档，选了具体项自动回到\n * 组件默认的近黑 —— 顺带让\"哪几条条件已生效\"一眼可见。\n */\nexport function unsetTriggerClass(value: string): string | undefined {\n  return value === UNSET_KEY ? UNSET_TEXT : undefined;\n}\n"
+    }
+  ]
+}

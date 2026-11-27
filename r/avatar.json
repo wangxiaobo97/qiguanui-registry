@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "avatar",
+  "type": "registry:ui",
+  "title": "头像",
+  "description": "单人或多人的头像，支持图片、首字母回退与堆叠。",
+  "dependencies": [],
+  "registryDependencies": [
+    "https://wangxiaobo97.github.io/qiguanui-registry/r/cx.json",
+    "https://wangxiaobo97.github.io/qiguanui-registry/r/tokens.json"
+  ],
+  "files": [
+    {
+      "path": "components/base/avatar/avatar.tsx",
+      "type": "registry:component",
+      "target": "@components/base/avatar/avatar.tsx",
+      "content": "/* eslint-disable @next/next/no-img-element */\nimport { useEffect, useState } from \"react\";\nimport type { HTMLAttributes, Ref } from \"react\";\nimport { cx, sortCx } from \"@/lib/cx\";\n\n/**\n * Figma source: Qiguan UI → Avatar (styles Avatar/1…Avatar/26; used throughout\n * dashboard 1, node 3731:2932).\n *\n * Sizes used in the designs (px):\n *   xs = 20   breadcrumb workspace marks     (initials 10/15 semibold)\n *   sm = 24   table rows                     (initials 12/16 semibold)\n *   md = 32   sidebar workspace / team card  (initials 16/22 semibold)\n *   lg = 36   people cards                   (initials 18/24 semibold)\n *\n * Renders a photo when `src` is given, otherwise centered initials on a\n * tinted disc. Initial tints from Figma:\n *   neutral → bg avatar/neutral/background, text text/secondary\n *   blue    → bg color/blue/300,    text color/blue/900\n *   lime    → bg color/lime/200,    text color/lime/700\n *   pink    → bg color/pink/200,    text color/pink/500\n */\n\ntype AvatarSize = \"xs\" | \"sm\" | \"md\" | \"lg\";\ntype AvatarColor = \"neutral\" | \"blue\" | \"lime\" | \"pink\";\n\nexport interface AvatarProps extends HTMLAttributes<HTMLSpanElement> {\n  size?: AvatarSize;\n  color?: AvatarColor;\n  /** Photo URL. Wins over `initials`. */\n  src?: string;\n  alt?: string;\n  /** Fallback initials, e.g. \"M\". */\n  initials?: string;\n  ref?: Ref<HTMLSpanElement>;\n}\n\nconst styles = sortCx({\n  base: \"inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full text-center align-middle transition-[width,height,font-size] duration-200 ease\",\n  size: {\n    xs: \"size-5 text-[10px] leading-[15px] font-semibold\",\n    sm: \"size-6 text-caption-1-semibold tracking-normal\",\n    md: \"size-8 text-headline-semibold\",\n    lg: \"size-9 text-[18px] leading-6 font-semibold\",\n  },\n  color: {\n    neutral: \"bg-avatar-neutral-background text-text-secondary\",\n    blue: \"bg-blue-300 text-blue-900\",\n    lime: \"bg-lime-200 text-lime-700\",\n    pink: \"bg-pink-200 text-pink-500\",\n  },\n});\n\nexport function Avatar({\n  size = \"md\",\n  color = \"neutral\",\n  src,\n  alt,\n  initials,\n  className,\n  ref,\n  ...props\n}: AvatarProps) {\n  /*\n   * 加载失败要回落到 initials —— 文档一直这么写，但实现里只有「有不有 src」这一个判断，\n   * 图片 404 时会露出浏览器的破损图标。\n   *\n   * 只用 onError 不够：`loading=\"lazy\"` + 服务端渲染时，图片还没开始加载，\n   * onError 不会触发，破损图标就这么留在页面上。所以这里先渲染 <img>（保证\n   * 正常图片的 SSR 与懒加载行为不变），失败后再切到 initials。\n   */\n  const [failedSrc, setFailedSrc] = useState<string | null>(null);\n\n  /*\n   * 用预加载探一次，而不是只靠 <img onError>。\n   *\n   * 原因：`loading=\"lazy\"` 的图片在首屏之外不会立刻加载，onError 迟迟不触发，\n   * 用户滑到那里看到的仍是浏览器破损图标。主动 new Image() 探一次，失败就切\n   * 首字母 —— 这条路径在 SSR 之后、图片可见之前就能跑完。\n   */\n  useEffect(() => {\n    if (!src) return;\n    let alive = true;\n    const probe = new Image();\n    probe.onerror = () => {\n      if (alive) setFailedSrc(src);\n    };\n    probe.src = src;\n    return () => {\n      alive = false;\n    };\n  }, [src]);\n\n  const showImage = Boolean(src) && failedSrc !== src;\n\n  return (\n    <span\n      ref={ref}\n      className={cx(styles.base, styles.size[size], styles.color[color], className)}\n      {...props}\n    >\n      {showImage ? (\n        <img\n          src={src}\n          alt={alt ?? \"\"}\n          loading=\"lazy\"\n          decoding=\"async\"\n          onError={() => setFailedSrc(src ?? null)}\n          /* 失败后立刻卸载 img，避免浏览器继续显示破损图标 */\n          className=\"size-full object-cover\"\n        />\n      ) : (\n        initials\n      )}\n    </span>\n  );\n}\n"
+    }
+  ],
+  "meta": {
+    "group": "数据展示",
+    "dir": "avatar",
+    "demo": "avatar"
+  }
+}

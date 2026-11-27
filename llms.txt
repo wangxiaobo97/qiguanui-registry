@@ -1,0 +1,406 @@
+# QiguanUI
+
+> 内部后台管理系统的设计系统。React 19 + Tailwind v4 + react-aria-components。
+> 它是本仓库的源码资产，不是 npm 包——`package.json` 里没有任何 UI 依赖。
+> 人读的完整手册在 `docs/USAGE.md`；本文件是给 AI 的紧凑索引，读完即可正确产出代码。
+
+## 1. 怎么 import（读这一节就能开始干活）
+
+三条铁律：
+
+1. `@/` 等于项目根。`@/components/base/buttons/button` 指向 `components/base/buttons/button.tsx`
+2. 没有桶文件。必须指到具体文件，`from "@/components/base/buttons"` 会报错
+3. 没有 default export。一律具名导入
+
+```tsx
+import { Button } from "@/components/base/buttons/button";
+import { RecordTable, type RecordColumn } from "@/components/application/record-table/record-table";
+import { QiSearch } from "@qiguan/qingicon";        // 本仓库内
+import { QiSearch } from "@/components/qiguan/icons"; // 外部项目（registry 装的）
+```
+
+**图标包只有本仓库有。** `@qiguan/qingicon` 是仓库内的 workspace 包，没有发布到 npm；
+外部项目里它不存在，装组件时下发的是 `components/qiguan/icons`，导出名完全一样。
+写代码前先看 `package.json` 里有没有 `@qiguan/qingicon` 这个依赖：没有就走第二条写法。
+
+**图标名不能凭语义拼。** 上游命名是「Qi + 名词 + 动作/方位」，同一个意思常有多个名字，
+拼错就是 `has no exported member`：
+
+- 下载 → `QiCircleDownload` / `QiSquareDownload`，**没有 `QiDownload`**
+- 删除 → `QiDeleteTrash`，没有 `QiTrash`
+- 包装层只含「组件本身用过的」图标；页面要新图标时从 `qingicon-react` 导入，
+  动手前先核对：
+
+  ```bash
+  grep -o "Qi[A-Za-z0-9]*" node_modules/qingicon-react/dist/index.d.ts | sort -u | grep -i download
+  ```
+
+  不确定名字的按钮就只写文字，不要硬猜。
+
+类型与组件同文件导出。`import type` 直接取 `RecordColumn<T>`、`RecordFilter<T>`、
+`RecordRowAction`、`Stat`、`FilterBarField`，不要重新声明 props 类型。
+
+目录三层，决定去哪找：
+
+| 目录 | 内容 | 判断标准 |
+|---|---|---|
+| `components/foundations/` | 矢量与原子件（chevrons、scroll-fade） | 无业务含义 |
+| `components/base/` | 原子组件，约 45 族 | 换个产品还能用 |
+| `components/application/` | 组合组件与页面级区块 | 绑定了本产品的信息架构 |
+
+一个目录一个组件族，一个文件一个变体。例：`base/buttons/` 下 `button.tsx`、
+`icon-button.tsx`、`link-button.tsx`、`close-button.tsx`、`button-group.tsx`。
+
+## 2. 新需求先归到四类，再动手
+
+| 需求形态 | 组合方式 | 区块现状 |
+|---|---|---|
+| 列表 / 台账页 | `AppShell` + `RecordTable`（1-2 个下拉） | 齐 |
+| 列表 / 台账页（字段多） | `AppShell` + `FilterBar` + `RecordTable` | 齐 |
+| 看板 / 首页 | `AppShell` + `StatCards` + 图表卡 | 齐 |
+| 表单页 | `FormPage` + `FormSection` | 齐 |
+| 详情页 | `DetailPage` + `DetailHeader` + `DetailSection` + `DetailItem` | 齐 |
+
+判断顺序：能套现成区块就只改 props；不能就在页面里用原子组件组合；
+**绝不要把组件源码复制进页面目录**——复制即失去同步，也失去统一修改的能力。
+
+## 3. 页面级区块
+
+**先确认你在哪种环境干活**，这决定下面哪些能用：
+
+| 环境 | 可用范围 |
+|---|---|
+| 本仓库内 | 全部（含 AppShell / form-page / detail-page） |
+| 外部项目（用 registry 装的） | 只有 `RecordTable`，以及 `components/base/` 全部原子组件 |
+
+`AppShell`、`form-page`、`detail-page` **不对外分发**：它们绑死了本产品的侧栏菜单、
+页签与通知中心，装到别的项目里没有对应数据。外部项目要页面骨架，自己写 `<main>` 与栅格。
+
+### AppShell
+`@/components/application/app-shell/app-shell`
+
+| prop | 类型 | 说明 |
+|---|---|---|
+| `heading` | string 必填 | 页面上唯一的页面名，不要另加标题，不要传 title/icon |
+| `actions` | ReactNode | 标题右侧操作区，传 null 表示不要 |
+| `tabs` | boolean，默认 true | 是否显示页签栏 |
+| `className` / `columnClassName` | string | 默认内容列 max-w-[1300px] |
+
+唯一不套 AppShell 的页面是 `/ai-chat`。
+
+### RecordTable — 通用台账表格（最常用）
+`@/components/application/record-table/record-table`
+
+必填：`ariaLabel`（表格无障碍名，也用于空态文案）、`unit`（量词）、`columns`、`rows`
+
+常用可选：`filters`、`searchText`（**是 `(row) => string` 访问器，不是搜索词**；不给则不显示搜索框）、`searchPlaceholder`、
+`pageSize`（默认 8）、`minWidth`（默认 1000）、`emptyMessage`、`showActions`（默认 true）、
+`inlineActions`、`menuActions`、`rowMenuLabel`、`showSizeToggle`（默认 true）、`selectable`
+
+```ts
+type RecordColumn<T> = {
+  id: string;
+  header: string;
+  cell: (row: T) => ReactNode;
+  width?: string;                          // Tailwind 宽度类，如 "w-[196px]"；不写按内容自适应
+  sortValue?: (row: T) => string | number; // 不给 = 该列不可排序
+  isRowHeader?: boolean;                   // 行首列
+};
+
+type RecordFilter<T> = {
+  id: string; ariaLabel: string; allLabel: string;
+  options: readonly string[];
+  match: (row: T, value: string) => boolean; // 命中判定由调用方给，组件不猜
+};
+
+type RecordRowAction = { icon: IconComponent; label: string };
+```
+
+约束：
+
+- **用 RecordTable 的页面必须是客户端组件**：`cell` 是函数，从 server component 传给
+  客户端组件会在构建期报 "Functions cannot be passed directly to Client Components"。
+  文件首行加 `"use client"`。
+- `selectable` 的复选框列不用声明，但 `minWidth` 会自动加 44px。
+- dev 下 Next 16 会提示 `unstable value Date.now()`：react-table 的调试计时被
+  cacheComponents 判成预渲染期读时间。dev-only 误报，生产构建不受影响，不要为此改组件。
+`showSizeToggle` 必须留在卡片工具栏内，不要挪到卡片外——否则要滚完整个列表才够得着。
+
+### FilterBar — 台账页顶部查询表单
+`@/components/application/filter-bar/filter-bar`
+
+必填：`fields`、`onQuery`、`onReset`（回车也触发 onQuery）
+可选：`columns`（2|3|4，默认 4）、`status`（右侧说明文字）
+
+字段是受控的，草稿值由调用方持有，`onQuery` 才提交成生效条件——日期改一半就重查会闪。
+
+```ts
+type FilterBarField =
+  | { kind: "text";   id: string; label: string; placeholder?: string;
+      value: string; onChange: (v: string) => void }
+  | { kind: "select"; id: string; label: string; allLabel: string;
+      options: readonly string[]; value: string; onChange: (v: string) => void }
+  | { kind: "date";   id: string; label: string;
+      value: CalendarDate | null; onChange: (v: CalendarDate | null) => void };
+```
+
+同一页不要和 `RecordTable` 自带的 `filters` 同时用。取舍：
+字段多 / 要日期区间 / 要显式查询动作 → 用 FilterBar 放表格外；
+一两个下拉加关键字 → 用 RecordTable 的 filters 放表格内。
+
+### StatCards — 全站唯一的 KPI 卡
+`@/components/application/dashboard/stat-cards`
+
+```ts
+type Stat = {
+  icon: IconComponent;
+  label: string;
+  value: string;    // 含单位的一个字符串，如 "1.21 亿"、"31%"。不是「数字 + unit」两段式
+  delta: string;    // 必填
+  deltaColor: "lime" | "rose" | "neutral";
+  tone?: "blue" | "orange" | "purple" | "pink" | "sky" | "emerald";
+  caption?: string;
+  hint?: string;
+};
+```
+
+`variant="plain"`（默认）紧凑行，`variant="footer"` 带页脚对比带。
+没有历史同期数据时，`delta` 放真实可算的事实（占比、口径说明），不要编同比数字。
+
+### FormPage / FormSection — 新建与编辑页
+`@/components/application/form-page/form-page`
+
+```tsx
+<FormPage heading="新建规则" onSubmit={save} onCancel={back} isSubmitting={pending}>
+  <FormSection title="基本信息" description="用于风控台账的展示与检索">
+    <Input label="规则名称" value={name} onChange={setName} isRequired />
+    <Select label="风险等级" selectedKey={level} onSelectionChange={setLevel}>…</Select>
+    <div className="md:col-span-2">
+      <Textarea label="判定说明" rows={3} value={note} onChange={setNote} />
+    </div>
+  </FormSection>
+</FormPage>
+```
+
+| prop | 说明 |
+|---|---|
+| `heading` | 必填，页面标题 |
+| `onSubmit` | 表单提交（默认行为已拦掉） |
+| `onCancel` | 不传则不渲染取消按钮 |
+| `isSubmitting` | 主按钮禁用并改文案，防连点 |
+| `footer` | 完全自定义底部，传了就不用默认操作条 |
+
+`FormSection`：`title` / `description` / `columns`（1｜2｜3，默认 2）。
+跨列字段在调用方传 `className="md:col-span-2"`，不要插空 div 占位。
+
+⚠️ `FormPage` / `DetailPage` 的 `actions` 默认是 `null`（关掉 AppShell 的全局默认按钮组），
+因为表单页顶部再出现「新建工单」是重复且误导。要自定义就传自己的节点。
+
+### DetailPage / DetailHeader / DetailSection / DetailItem — 查看单条
+`@/components/application/detail-page/detail-page`
+
+```tsx
+<DetailPage heading="规则详情">
+  <DetailHeader
+    title="大额转账二次核验"
+    badge={<Chip variant="subtle" color="rose">高</Chip>}
+    meta="规则编号 R-2026-0114 · 最近更新 2026-11-12"
+    actions={<Button variant="primary" size="small">提交审核</Button>}
+  />
+  <DetailSection title="基本信息" columns={3}>
+    <DetailItem label="责任人" value="张明" />
+  </DetailSection>
+</DetailPage>
+```
+
+`DetailSection` 的 `columns` 取 2｜3｜4（默认 3）；它的 `children` 必须是 `DetailItem`
+——内部是 `<dl>`，`DetailItem` 渲染 `dt`+`dd`，读屏才能念出键值对应关系。
+需要占满整行时给 `DetailItem` 传 `className="md:col-span-2"`。
+
+### 其他 application 区块
+
+| 组件 | 导入 | 用途 |
+|---|---|---|
+| `DataTableExample` | `application/data-table/data-table` | 功能全开的表格示例，仅参考，业务用 RecordTable |
+| `NotificationCenter` | `application/notification-center/notification-center` | 通知中心 |
+| `SettingsGeneral` 等 | `application/settings/settings-*` | 设置页各子页 |
+| `DashboardPanel` 系列 | `application/dashboard/*` | 看板面板、环形仪表、图表卡 |
+| `AgentChat` 系列 | `application/agent-chat/agent-chat` | AI 问答界面 |
+
+## 4. 原子组件（base/）
+
+按钮与操作：
+
+| 组件 | 导入 | 说明 |
+|---|---|---|
+| `Button` | `base/buttons/button` | variant: primary/secondary/ghost/danger；size: medium/small/xs |
+| `IconButton` | `base/buttons/icon-button` | 只放图标，必须给 aria-label |
+| `LinkButton` | `base/buttons/link-button` | 长得像链接的按钮 |
+| `ButtonGroup` | `base/buttons/button-group` | 按钮组 |
+| `CloseButton` | `base/buttons/close-button` | 关闭 |
+
+表单与输入：
+
+| 组件 | 导入 | 说明 |
+|---|---|---|
+| `Input` / `InputBase` | `base/input/input` | 带 label / 裸框 |
+| `Label` | `base/input/label` | 字段标签 |
+| `HintText` | `base/input/hint-text` | 字段说明与错误 |
+| `Textarea` | `base/textarea/textarea` | 多行 |
+| `Select` / `SelectItem` | `base/select/select` | 下拉选择。`label` · `isRequired` · `hint` · `selectedKey` + `onSelectionChange` |
+| `ComboBox` | `base/combobox/combobox` | 可搜索下拉 |
+| `Checkbox` | `base/checkbox/checkbox` | 复选 |
+| `Radio` | `base/radio/radio` | 单选 |
+| `Switch` | `base/switch/switch` | 开关 |
+| `Slider` | `base/slider/slider` | 滑块 |
+| `DatePicker` | `base/date-picker/date-picker` | 日期，值为 CalendarDate。`label` · `hint` · `isRequired` |
+| `DateCalendar` | `base/date-picker/date-calendar` | 日历面板 |
+| `TimeField` | `base/time-field/time-field` | 时间 |
+| `NumberField` | `base/number-field/number-field` | 数字 |
+| `InputOtp` | `base/input-otp/input-otp` | 验证码 |
+| `FileUpload` | `base/file-upload/file-upload` | 上传 |
+| `SearchField` | `base/search-field/search-field` | 搜索框 |
+| `ColorPicker` | `base/color-picker/color-picker` | 取色 |
+| `SegmentedControl` / `SegmentedControlItem` | `base/segmented-control/segmented-control` | 分段控件 |
+
+徽标与标识：
+
+| 组件 | 导入 | 说明 |
+|---|---|---|
+| `Badge` | `base/badges/badge` | 数字徽标 |
+| `Chip` | `base/badges/chip` | 状态标签，variant: subtle/caption；color: gray/blue/cyan/purple/rose/yellow/lime/soft |
+| `StatusDot` | `base/badges/status-dot` | 状态圆点，color: green/yellow/indigo 等 |
+| `Avatar` | `base/avatar/avatar` | 头像，size: xs 等 |
+| `Kbd` | `base/kbd/kbd` | 按键提示 |
+
+导航与浮层：
+
+| 组件 | 导入 | 说明 |
+|---|---|---|
+| `Tabs` | `base/tabs/tabs` | 页签 |
+| `PillTab` | `base/tabs/pill-tab` | 胶囊页签 |
+| `Breadcrumb` | `base/breadcrumb/breadcrumb` | 面包屑 |
+| `Pagination` | `base/pagination/pagination` | 分页 |
+| `Dropdown` / `DropdownTrigger` / `DropdownPopover` / `DropdownItem` | `base/dropdown/dropdown` | 下拉菜单 |
+| `ContextMenu` | `base/context-menu/context-menu` | 右键菜单 |
+| `Popover` | `base/popover/popover` | 浮层 |
+| `Tooltip` / `TooltipTrigger` | `base/tooltip/tooltip` | 提示气泡 |
+| `Modal` | `base/modal/modal` | 弹窗 |
+| `Drawer` | `base/drawer/drawer` | 抽屉 |
+| `Accordion` | `base/accordion/accordion` | 折叠面板 |
+| `CommandPalette` | `base/command-palette/command-palette` | 命令面板 |
+| `TreeView` | `base/tree-view/tree-view` | 树形 |
+| `Carousel` | `base/carousel/carousel` | 轮播 |
+
+反馈与状态：
+
+| 组件 | 导入 | 说明 |
+|---|---|---|
+| `Notification` | `base/notification/notification` | 通知条 |
+| `Announcement` | `base/announcement/announcement` | 公告 |
+| `Toast` | `base/toast/toast` | 轻提示 |
+| `Spinner` | `base/spinner/spinner` | 加载 |
+| `Skeleton` | `base/skeleton/skeleton` | 骨架屏 |
+| `Progress` | `base/progress/progress` | 进度条 |
+| `Meter` | `base/meter/meter` | 量表 |
+| `TagGroup` | `base/tag-group/tag-group` | 标签组 |
+| `Divider` | `base/divider/divider` | 分隔线 |
+| `Table` | `base/table/table` | 底层表格原子件，业务用 RecordTable |
+| `SocialButton` | `base/social-button/social-button` | 第三方登录 |
+
+图标只有一个来源：`@qiguan/qingicon`，3901 个图标 34 分类。
+
+```tsx
+<Button leadingIcon={QiSearch} />
+<QiSearch className="size-4 text-foreground-icon-secondary" />
+```
+
+传组件引用而不是元素；尺寸用 className（size-4 / size-5），不要用 size 属性；
+不要用 color 属性硬编码颜色（暗色不会翻）；`variant="fill"` 目前渲染空白，不要用。
+
+## 5. 样式规则（不许写字面量）
+
+颜色走语义 token，`styles/theme.css` 是唯一源，共 281 个 `--color-*`
+（189 个语义 token + 92 个色阶）。日常只用语义那一批。
+
+```tsx
+<p className="text-body-medium text-text-primary">主文字</p>
+<p className="text-body-medium text-text-secondary">次文字</p>
+<div className="border border-border-table bg-background-primary-default">卡片</div>
+<hr className="border-separator-border" />
+```
+
+暗色由 `.dark` 切换同名 token 自动完成，永远不要写 `dark:` 覆盖。
+页面内的卡片不要用 `bg-background-full`（那就是页面背景，会同色糊在一起），
+整页版卡片用 `bg-background-primary-default` + `border-border-button-default`。
+
+卡片表面与间距一律走共享常量：
+
+```tsx
+import { CARD_SURFACE, CARD_INSET, CARD_GAP, CARD_RHYTHM_PX } from "@/components/application/card-surface";
+```
+
+`CARD_SURFACE` 白底加 border-border-table 描边；`CARD_INSET` = p-2.5；
+`CARD_GAP` = gap-2.5；`CARD_RHYTHM_PX` = 10（全站水平节奏）。
+RecordTable 故意不加横向内衬，卡片上再补一层会让单元格变成 20px 内缩，与查询卡对不齐。
+
+排版用 52 个合成工具类，一次设定字号、行高、字距、字重：
+
+```
+text-{family}-{weight}
+family: large-title / display-1..4 / title-1..3 / headline / body / body-2 / caption-1 / caption-2
+weight: regular / medium / semibold / bold
+```
+
+例：`text-body-medium`、`text-title-1-semibold`、`text-caption-2-bold`。
+不要手工拼 `text-sm font-medium leading-5`，那样拿不到字距。
+数字列加 `tabular-nums`；整页文字容器挂 `font-tcloud`。
+
+## 6. 硬禁止
+
+| 禁止 | 原因 | 正确做法 |
+|---|---|---|
+| 写颜色字面量（#fff / rgb()） | 暗色不会翻，改主色改不动 | 用语义 token |
+| `dark:` 覆盖 | 与 .dark 同名 token 切换冲突 | 只引 token |
+| 手工拼字号行高 | 丢字距，不跟规范联动 | 用 text-* 合成类 |
+| `toLocaleString()` | hydration 失败 | 用 `utils/format-number.ts` 的 `formatThousands()` |
+| `Date.now()` / 无参 `new Date()` | 服务端客户端取值不同，hydration 失败 | 演示数据写死日期，用固定 `new CalendarDate(y,m,d)` |
+| 复制组件源码进页面 | 失去同步与统一修改能力 | 从组件路径 import |
+| 只改侧边栏就以为新页面会出现在页签 | 三处共用一份配置 | 改 `app-shell/nav-config.ts` |
+| 往导航里加没有 page.tsx 的入口 | 必然 404 | 先建页面再注册 |
+
+## 7. 新增一个页面的固定四步
+
+顺序不能反：
+
+```
+1. 建文件    app/<route>/page.tsx
+2. 注册导航  components/application/app-shell/nav-config.ts 的 appNav() 分组 items 加 { label, href }
+3. 类型检查  npx tsc --noEmit
+4. 打开看    http://localhost:3000/<route>，确认侧边栏与页签都对
+```
+
+导航只有一份数据源，顶栏、侧边栏、页签三处共用，不要在任何组件里再抄路由表。
+例外：`/` 的标签有两处独立硬编码（`nav-config.ts` 和 `page-tabs-store.ts` 的 `HOME_TAB`），
+改名必须同时改。
+
+## 8. 改公共组件的安全边界
+
+改之前先搜引用范围：
+
+```bash
+grep -rn 'from "@/components/base/buttons/button"' components app
+```
+
+加可选 prop 是安全改动；改默认值、改类名、删 prop 属于破坏性变更，要先确认调用点。
+
+## 9. 拼装约定
+
+四类页面的区块都齐了，表单与详情页**不要再用原子组件手拼**，直接用第 3 节的
+`FormPage` / `DetailPage`——它们存在的意义就是消掉「每页手拼导致标题字号和间距各差一点」。
+
+字段一律用控件自己的 `label` / `hint`（`Input` / `Textarea` / `Select` / `DatePicker` 都有），
+不要在外面手写标签，也不要传了 `label` 再传 `aria-label`（读屏会重复播报）。
+
+四类之外的新页面形态，先用原子组件在页面里拼；**同样的结构出现第三次时**，
+提到 `application/` 下成为正式区块，不要留在页面里。
